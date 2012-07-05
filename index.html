@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Cloud Query</title>
+
+  <script src="lib/jquery-1.7.2.min.js" type="text/javascript"></script>
+  <script src="lib/underscore-min.js" type="text/javascript"></script>
+  <script src="lib/backbone-min.js" type="text/javascript"></script>
+  <!--script src="lib/iCanHaz.js/iCanHaz.min.js" type="text/javascript"></script-->
+  <script type="text/javascript" src="lib/mustache.js"></script>
+  <script type="text/javascript" src="js/App.js"></script>
+  <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css" type="text/css">
+  <!--link rel="stylesheet" href="lib/bootstrap/css/bootstrap-responsive.min.css" type="text/css"-->
+  <link rel="stylesheet" type="text/css" href="css/App.css">
+</head>
+<body>
+  <script id="queryCriteria" type="text/template">
+    <li id="criteria_{{ cid }}" class="row"> 
+        <div class="criteria span5">
+          <select class="input-small">
+            {{#selectors}}
+            <option value="{{selector}}">{{selector}}</option>
+            {{/selectors}}
+          </select>
+          <select class="operator input-small">
+            {{#operators}}
+            <option value="{{operator}}">{{operator}}</option>
+            {{/operators}}
+          </select>
+          <input class="input-small span1" type="text"/>
+        </div>
+        <div class="controls span1">
+          <a href="#criteria/add"><i class="icon-plus"></i></a>
+          <a href="#criteria/remove/{{ cid }}"><i class="icon-minus"></i></a></li>
+        </div>
+  </script>
+
+</body>
+</html>
