@@ -29,12 +29,32 @@
             <option value="{{operator}}">{{operator}}</option>
             {{/operators}}
           </select>
-          <input class="input-small span1" type="text"/>
+          <input class="input-small span1 mininum" type="text"/>
         </div>
         <div class="controls span1">
-          <a href="#criteria/add"><i class="icon-plus"></i></a>
-          <a href="#criteria/remove/{{ cid }}"><i class="icon-minus"></i></a></li>
+          <a href="#criteria/add"><i class="icon-plus-sign"></i></a>
+          <a href="#criteria/remove/{{ cid }}"><i class="icon-minus-sign"></i></a></li>
         </div>
+  </script>
+  <script id="queryBuilder" type="text/template">
+    <div class="row span7">
+      
+      Match
+        <select class="input-small">
+          <option value="Any">Any</option>
+          <option value="All">All</option>
+        </select>
+      Of the following rules
+
+      <div class="row span6">
+        <ul id="criteriaList" class="unstyled span6"></ul>
+      </div>
+    </div>
+
+    <div class="row well span7">
+      <button type="submit" class="btn btn-primary offset5">Query</button>
+    </div>
+    
   </script>
 
 </body>

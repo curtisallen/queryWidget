@@ -31,7 +31,12 @@ var QueryCollection = Backbone.Collection.extend({
 });
 
 var QuerySet = Backbone.Collection.extend({
-  model: QueryCollection
+  model: QueryCollection,
+
+  initialize: function(){
+    this.queryCollection = new QueryCollection();
+    this.queryCollection.parent = this;
+  }
 });
 // 
 // Views
@@ -59,7 +64,8 @@ var QueryView = Backbone.View.extend({
     var selectedOption = this.$('.operator option:selected').text();
     // if RANGE term selected add another text box
     if(selectedOption === 'IS IN THE RANGE') {
-      this.$('.criteria').append('<input type="text" class="input-small span1 maxRange" />');
+      this.$('.criteria').append('<input type="text" class="input-small span1 maxRange" placeholder="Max"/>');
+      this.$('.mininum').replaceWith('<input type="text" class="input-small span1 minRange" placeholder="Min"/>');
     } else { // make sure there is a single text box
       this.$('.maxRange').remove();
     }
@@ -81,7 +87,7 @@ var QueryView = Backbone.View.extend({
 var CloudQueryAppModel = Backbone.Model.extend({
   initialize: function() {
     this.queryCondition = new QueryCollection();
-    //this.querySet = new QuerySet();
+    this.querySet = new QuerySet();
   }
 });
 
@@ -91,14 +97,15 @@ var CloudQueryAppView = Backbone.View.extend({
     this.model.queryCondition.bind('add', this.addCriteria);
     this.model.queryCondition.bind('remove', this.removeCriteria);
 
+    //this.queryView = new QueryView();
+    //this.queryView.parentView = this;
+    //$(this.el).append(this.queryView.el);
     //this.model.querySet.bind('add', this.addSet);
     //this.model.querySet.bind('add', this.removeSet);
   },
 
   render: function() {
-    var template = '\
-      <!--h1>Cloud Query Widget</h1-->\
-      <ul id="criteriaList" class="unstyled"></ul>';
+    var template = $('#queryBuilder').html();
     $(this.el).html(Mustache.to_html(template, this.model.toJSON()));
     this.criteriaList = this.$('#criteriaList');
     return this;
