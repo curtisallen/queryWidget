@@ -23,34 +23,41 @@ var Criteria = Backbone.Model.extend({
         if(! _.include(['IS', 'IS EQUAL', 'IS NOT', 'IS IN THE RANGE'], attribs.operator)) {
           return "Invalid operator must be in set ['IS', 'IS EQUAL', 'IS NOT', 'IS IN THE RANGE']";
         }
-      }
+      },
+      
+      defaults: {
+        "selectors": [{"selector": "SELECTOR1"}, {"selector": "SELECTOR2"}, {"selector": "SELECTOR3"}, {"selector": "SELECTOR4"}, {"selector": "SELECTOR5"}],
+        "operators": [{"operator": "IS"}, {"operator": "IS NOT"}, {"operator": "IS EQUAL"}, {"operator": "IS IN THE RANGE"}],
+        "values": 1,
+        "createValueText": function(){
+            return function(text, render) {
+                var output = '';
+                for (i=0; i<parseInt(text); i++){
+                    output = output + '<input class="input-small span1 mininum" type="text"/>';
+                }
+                return output;
+            }
+        }
+        }
     });
 
 var QueryCollection = Backbone.Collection.extend({
   model: Criteria
 });
 
-var QuerySet = Backbone.Collection.extend({
-  model: QueryCollection,
-
-  initialize: function(){
-    this.queryCollection = new QueryCollection();
-    this.queryCollection.parent = this;
-  }
-});
 // 
 // Views
 //
 var QueryView = Backbone.View.extend({
   initialize: function(args) {
-    _.bindAll(this, 'changeTitle', 'operatorChange');
-    this.model.bind('change:title', this.changeTitle);
+    _.bindAll(this, 'operatorChange', 'valueChange');
     this.model.bind('operator:change', this.operatorChange);
+    this.model.bind('value:change', this.valueChange);
   },
 
   events: {
-    'click .title': 'handleTitleClick',
-    'change .operator': 'operatorChange'
+    'change .operator': 'operatorChange',
+    'blur .mininum': 'valueChange'
   },
 
   render: function() {
@@ -64,21 +71,20 @@ var QueryView = Backbone.View.extend({
     var selectedOption = this.$('.operator option:selected').text();
     // if RANGE term selected add another text box
     if(selectedOption === 'IS IN THE RANGE') {
-      this.$('.criteria').append('<input type="text" class="input-small span1 maxRange" placeholder="Max"/>');
-      this.$('.mininum').replaceWith('<input type="text" class="input-small span1 minRange" placeholder="Min"/>');
+      //this.$('.criteria').append('<input type="text" class="input-small span1 maxRange" placeholder="Max"/>');
+      //this.$('.mininum').replaceWith('<input type="text" class="input-small span1 minimum" placeholder="Min"/>');
+      //console.log(app);
+      app.navigate("criteria/modify/" + this.model.cid, {trigger:  true});
     } else { // make sure there is a single text box
-      this.$('.maxRange').remove();
+      //this.$('.maxRange').remove();
     }
     //this.$('.operator').onChange(console.log("Operator clicked!"));
   },
 
-  changeTitle: function() {
-    this.$('.title').text(this.model.get('title'));
-  },
-
-  handleTitleClick: function() {
-    alert('you clicked the title: '+this.model.get('title'));
+  valueChange: function() {
+     console.log("Value Changed");
   }
+ 
 });
 
 //
@@ -87,7 +93,6 @@ var QueryView = Backbone.View.extend({
 var CloudQueryAppModel = Backbone.Model.extend({
   initialize: function() {
     this.queryCondition = new QueryCollection();
-    this.querySet = new QuerySet();
   }
 });
 
@@ -97,11 +102,6 @@ var CloudQueryAppView = Backbone.View.extend({
     this.model.queryCondition.bind('add', this.addCriteria);
     this.model.queryCondition.bind('remove', this.removeCriteria);
 
-    //this.queryView = new QueryView();
-    //this.queryView.parentView = this;
-    //$(this.el).append(this.queryView.el);
-    //this.model.querySet.bind('add', this.addSet);
-    //this.model.querySet.bind('add', this.removeSet);
   },
 
   render: function() {
@@ -131,31 +131,28 @@ var CloudQueryAppRouter = Backbone.Router.extend({ //(Backbone.js 0.5.3, use Rou
   routes: {
     "criteria/add": "add",
     "criteria/remove/:number": "remove",
+    "criteria/modify/:number": "modifyCriteria"
   },
 
   add: function() {
-    app.model.queryCondition.add(new Criteria({
-      selectors: [{"selector": "SELECTOR1"}, {"selector": "SELECTOR2"}, {"selector": "SELECTOR3"}, {"selector": "SELECTOR4"}, {"selector": "SELECTOR5"}],
-      operators: [{"operator": "IS"}, {"operator": "IS NOT"}, {"operator": "IS EQUAL"}, {"operator": "IS IN THE RANGE"}]
-      })
-    );
-    //app.model.queryCondition.add(defaultCriteria);
+    app.model.queryCondition.add(new Criteria());
     this.navigate('criteria'); // reset location so we can trigger again (Backbone.js 0.5.3, use navigate instead of saveLocation)
   },
 
   remove: function(cid) {
     app.model.queryCondition.remove(app.model.queryCondition.getByCid(cid));
   },
+  
+  modifyCriteria: function(cid) {
+    console.log("I see this cid: " + cid);  
+    var modified = app.model.queryCondition.getByCid(cid);
+    modified.set({values: 2});
+    //app.model.queryCondition.set(modified);
+  }
 });
 $(function() {
       var QueryApp = new CloudQueryAppRouter({append_at: $('body')});
       window.app = QueryApp;
       Backbone.history.start();
-
-      var defaultCriteria = new Criteria({
-      selectors: [{"selector": "SELECTOR1"}, {"selector": "SELECTOR2"}, {"selector": "SELECTOR3"}, {"selector": "SELECTOR4"}, {"selector": "SELECTOR5"}],
-      operators: [{"operator": "IS"}, {"operator": "IS NOT"}, {"operator": "IS EQUAL"}, {"operator": "IS IN THE RANGE"}]
-      });
-
-      app.model.queryCondition.add(defaultCriteria);
+      app.model.queryCondition.add(new Criteria());
 });

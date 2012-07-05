@@ -17,7 +17,7 @@
 </head>
 <body>
   <script id="queryCriteria" type="text/template">
-    <li id="criteria_{{ cid }}" class="row"> 
+    <li id="criteria_{{ cid }}" class="row" > 
         <div class="criteria span5">
           <select class="input-small">
             {{#selectors}}
@@ -29,7 +29,10 @@
             <option value="{{operator}}">{{operator}}</option>
             {{/operators}}
           </select>
-          <input class="input-small span1 mininum" type="text"/>
+          {{#createValueText}}
+             {{values}}
+          {{/createValueText}}
+          
         </div>
         <div class="controls span1">
           <a href="#criteria/add"><i class="icon-plus-sign"></i></a>
